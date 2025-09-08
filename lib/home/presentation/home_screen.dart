@@ -7,6 +7,20 @@ class HomeScreen extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("FCM Notification"),
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+      ),
+
+      body: SafeArea(
+        child: Center(
+          child: Obx(
+            () => Text("User fcm token is -- ${controller.userFcmToken}"),
+          ),
+        ),
+      ),
+    );
   }
 }
