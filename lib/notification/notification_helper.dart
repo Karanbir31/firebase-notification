@@ -168,6 +168,8 @@ class NotificationHelper {
 
   void handleNotificationResponse(NotificationResponse response) {
     if (response.actionId == "action_cancel") {
+      _localNotification.cancel(response.id ?? 0);
+
       Get.snackbar(
         "button click",
         "You click cancel button in notification",
