@@ -49,38 +49,8 @@ class NotificationHelper {
 
     await _localNotification.initialize(
       settings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        if (response.actionId == "action_cancel") {
-          Get.snackbar(
-            "button click",
-            "You click cancel button in notification",
-            backgroundColor: Colors.blueAccent,
-            snackPosition: SnackPosition.BOTTOM,
-          );
-          return;
-        }
-
-        if (response.payload != null) {
-          // play load contain two keys and values 1st screenId and userId
-          try {
-            final data = jsonDecode(response.payload!);
-            final screenId = data['screenId'] ?? "A";
-            final userID = data['userId'] ?? "userID NA";
-            if (screenId == 'A' || screenId == 'a') {
-              Get.to(ScreenA(), arguments: userID);
-            } else {
-              Get.to(ScreenB(), arguments: userID);
-            }
-            debugPrint(
-              "NotificationHelper Notification tapped, payload screenId -- $screenId and userId -- $userID",
-            );
-          } catch (error) {
-            debugPrint(
-              "NotificationHelper error in onDidReceiveNotificationResponse $error ",
-            );
-          }
-        }
-      },
+      onDidReceiveBackgroundNotificationResponse: handleNotificationResponse,
+      onDidReceiveNotificationResponse: handleNotificationResponse,
     );
 
     //  Create Android channel explicitly
@@ -163,13 +133,12 @@ class NotificationHelper {
                 showsUserInterface: true,
                 cancelNotification: true,
               ),
-               AndroidNotificationAction(
+              AndroidNotificationAction(
                 "action_open",
                 "Open",
                 showsUserInterface: true,
                 cancelNotification: true,
               ),
-
             ],
           );
 
@@ -195,5 +164,38 @@ class NotificationHelper {
     await file.writeAsBytes(response.bodyBytes);
     debugPrint("NotificationHelper Image from url is saved at $filePath");
     return filePath;
+  }
+
+  void handleNotificationResponse(NotificationResponse response) {
+    if (response.actionId == "action_cancel") {
+      Get.snackbar(
+        "button click",
+        "You click cancel button in notification",
+        backgroundColor: Colors.blueAccent,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (response.payload != null) {
+      // play load contain two keys and values 1st screenId and userId
+      try {
+        final data = jsonDecode(response.payload!);
+        final screenId = data['screenId'] ?? "A";
+        final userID = data['userId'] ?? "userID NA";
+        if (screenId == 'A' || screenId == 'a') {
+          Get.to(ScreenA(), arguments: userID);
+        } else {
+          Get.to(ScreenB(), arguments: userID);
+        }
+        debugPrint(
+          "NotificationHelper Notification tapped, payload screenId -- $screenId and userId -- $userID",
+        );
+      } catch (error) {
+        debugPrint(
+          "NotificationHelper error in onDidReceiveNotificationResponse $error ",
+        );
+      }
+    }
   }
 }
