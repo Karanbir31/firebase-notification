@@ -9,16 +9,29 @@ class HomeScreen extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("FCM Notification"),
+        title: const Text("FCM Notification"),
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
       ),
-
       body: SafeArea(
         child: Center(
-          child: Obx(
-            () => Text("User fcm token is -- ${controller.userFcmToken}"),
-          ),
+          child: Obx(() {
+            if (controller.isNotificationPermissionGranted.value) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Notification permission is granted"),
+                  const SizedBox(height: 12),
+                  Obx(() => Text("FCM Token: ${controller.userFcmToken.value}")),
+                ],
+              );
+            } else {
+              return ElevatedButton(
+                onPressed: controller.requestNotificationPermission,
+                child: const Text("Enable Notification Permission"),
+              );
+            }
+          }),
         ),
       ),
     );

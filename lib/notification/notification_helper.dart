@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:mynotification/screen_a.dart';
 import 'package:mynotification/screen_b.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -49,7 +50,7 @@ class NotificationHelper {
 
     await _localNotification.initialize(
       settings,
-      onDidReceiveBackgroundNotificationResponse: handleNotificationResponse,
+      //onDidReceiveBackgroundNotificationResponse: handleNotificationResponse,
       onDidReceiveNotificationResponse: handleNotificationResponse,
     );
 
@@ -77,6 +78,14 @@ class NotificationHelper {
   }
 
   Future<void> showNotification(RemoteMessage message) async {
+    bool isNotifyPermissionGranted = await checkNotificationPermission();
+    if (!isNotifyPermissionGranted) {
+      debugPrint(
+        " \n\n<<=======================Need Notification permission ------>> \n\n",
+      );
+      return;
+    }
+
     final notification = message.notification;
     final androidNotification = message.notification?.android;
     String? playLoadFromFCM = message.data.isNotEmpty
@@ -199,5 +208,11 @@ class NotificationHelper {
         );
       }
     }
+  }
+
+  Future<bool> checkNotificationPermission() async {
+    final notifyPermission = Permission.notification;
+    bool isGranted = await notifyPermission.isGranted;
+    return isGranted;
   }
 }
